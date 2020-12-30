@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.lawlett.yourquiz.R
 import com.lawlett.yourquiz.core.BaseFragment
@@ -28,6 +27,8 @@ class GameFragment : BaseFragment(R.layout.fragment_game) {
     lateinit var thirdAnswer: String
     lateinit var fourAnswer: String
     lateinit var answerQuestion: String
+    lateinit var result: String
+
     var rightAnswer: Int = 0
     var wrongAnswer: Int = 0
     var currentLevel: Int = 1
@@ -75,10 +76,13 @@ class GameFragment : BaseFragment(R.layout.fragment_game) {
     private fun firstButton() {
         binding.firstBtn.setOnClickListener {
             if (firstAnswer == answerQuestion) {
+                result = "Верно"
                 rightAnswer++
                 requireContext().toastShow("Верно")
                 showDialog()
             } else {
+                result = "Неа"
+                showDialog()
                 wrongAnswer++
                 requireContext().toastShow("Неа")
             }
@@ -88,10 +92,13 @@ class GameFragment : BaseFragment(R.layout.fragment_game) {
     private fun secondButton() {
         binding.secondBtn.setOnClickListener {
             if (secondAnswer == answerQuestion) {
+                result = "Верно"
                 rightAnswer++
                 requireContext().toastShow("Верно")
                 showDialog()
             } else {
+                result = "Неа"
+                showDialog()
                 requireContext().toastShow("Неа")
             }
         }
@@ -100,10 +107,13 @@ class GameFragment : BaseFragment(R.layout.fragment_game) {
     private fun thirdButton() {
         binding.thirdBtn.setOnClickListener {
             if (thirdAnswer == answerQuestion) {
+                result = "Верно"
                 rightAnswer++
                 requireContext().toastShow("Верно")
                 showDialog()
             } else {
+                result = "Неа"
+                showDialog()
                 wrongAnswer++
                 requireContext().toastShow("Неа")
             }
@@ -113,12 +123,14 @@ class GameFragment : BaseFragment(R.layout.fragment_game) {
     private fun fourButton() {
         binding.fourBtn.setOnClickListener {
             if (fourAnswer == answerQuestion) {
+                result = "Верно"
                 rightAnswer++
                 requireContext().toastShow("Верно")
                 showDialog()
-            } else if (currentLevel == 20) {
-                requireContext().toastShow("Верные"+rightAnswer+"Не верные"+wrongAnswer )
+
             } else {
+                result = "Неа"
+                showDialog()
                 wrongAnswer++
                 requireContext().toastShow("Неа")
             }
@@ -133,7 +145,8 @@ class GameFragment : BaseFragment(R.layout.fragment_game) {
         binding.thirdBtn.text = thirdAnswer
         binding.fourBtn.text = fourAnswer
     }
-    private fun showResultDialog(){
+
+    private fun showResultDialog() {
         val mDialogView =
             LayoutInflater.from(requireContext()).inflate(R.layout.result_dialog, null)
         val mBuilder = AlertDialog.Builder(requireContext()).setView(mDialogView)
@@ -144,24 +157,23 @@ class GameFragment : BaseFragment(R.layout.fragment_game) {
         mDialogView.findViewById<TextView>(R.id.apply_btn).setOnClickListener {
             mAlertDialog.dismiss()
         }
-
     }
 
     private fun showDialog() {
         val mDialogView =
             LayoutInflater.from(requireContext()).inflate(R.layout.answer_dialog, null)
         val mBuilder = AlertDialog.Builder(requireContext()).setView(mDialogView)
-            .setTitle(answerQuestion)
+            .setTitle(result)
         val mAlertDialog = mBuilder.show()
         mDialogView.findViewById<TextView>(R.id.description).text = description
         mDialogView.findViewById<TextView>(R.id.my_question).text = question
         mDialogView.findViewById<Button>(R.id.apply_btn).setOnClickListener {
-            if (currentLevel==20){
+            if (currentLevel == 20) {
                 mAlertDialog.dismiss()
                 showResultDialog()
                 requireContext().toastShow("20")
-            }else{
-            viewModel.getLevel(1 + currentLevel++).observe(viewLifecycleOwner, { level ->
+            } else {
+                viewModel.getLevel(1 + currentLevel++).observe(viewLifecycleOwner, { level ->
                     val model = level[0]
                     levelNumber = model.id.toString()
                     description = model.description.toString()
@@ -176,9 +188,10 @@ class GameFragment : BaseFragment(R.layout.fragment_game) {
                     secondButton()
                     thirdButton()
                     fourButton()
+                }
+                )
+                mAlertDialog.dismiss()
             }
-            )
-            mAlertDialog.dismiss()
         }
     }
-}}
+}
